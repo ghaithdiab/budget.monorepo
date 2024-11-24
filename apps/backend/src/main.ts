@@ -13,6 +13,10 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   // app.use(cookieParser());
+  app.enableCors({
+    origin: 'http://localhost:3000', // Allow requests from Next.js frontend
+    credentials: true, // Allow cookies if needed
+  });
   await app.listen(3001);
 }
 bootstrap();
