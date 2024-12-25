@@ -1,15 +1,16 @@
-import { Role } from "@prisma/client";
-import { IsEmail, IsString, Length } from "class-validator";
+import { Role } from '@prisma/client';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class CreateUserDto{
+export class CreateUserDto {
   @IsString()
-  @Length(2,null,{message:'name not valide'})
-  readonly name:string;
+  // @Length(2, null, { message: 'name not valide' })
+  readonly name?: string;
   @IsEmail()
-  readonly email:string;
-  readonly password:string;
-  readonly birthday:Date;
-  readonly role :Role;
-  readonly verified: boolean;
+  @IsNotEmpty()
+  readonly email: string;
+  @IsNotEmpty()
+  readonly password: string;
+  readonly birthday?: Date;
+  readonly role?: Role;
+  readonly verified?: boolean;
 }
-
