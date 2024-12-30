@@ -1,8 +1,8 @@
 "use server"
-
-import { redirect } from "next/navigation";
-import { BACKEND_URL } from "./constants";
 import { FormState, SignupFormSchema } from "./type";
+import axiosInstance from "@/util/axiosInstance";
+import handleAxiosError from "@/util/errorHandler";
+import { redirect } from "next/navigation";
 
 
 
@@ -19,24 +19,16 @@ export async function signUp(state: FormState,formData: FormData): Promise<FormS
   });
 
   if (!validationFields.success) return { error: validationFields.error.flatten().fieldErrors};
-  const response = await fetch(`${BACKEND_URL}auth/signUp`,
-    {
-      method: "POST",
+  let response;
+  try {
+    response = await axiosInstance.post('auth/signUp',validationFields.data,{
       headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(validationFields.data),
-    }
-  )
-
-  console.log(validationFields.data)
-  if (response.ok) {
-    redirect("/auth/signin");
-  } else
-    return {
-      message:
-        response.status === 409
-          ? "The user is already existed!"
-          : response.statusText,
-    };
+              "Content-Type": "application/json",
+              },
+    })
+  }catch(err){
+    return {message : handleAxiosError(err)}
+  }
+  redirect(`/auth/verification?userId=${response.data.id}`);
+  
 }

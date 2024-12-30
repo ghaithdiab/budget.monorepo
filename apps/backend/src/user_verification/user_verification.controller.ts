@@ -9,7 +9,7 @@ export class UserVerificationController {
   ) {}
 
   @Public()
-  @Post(':userID')
+  @Post('verification:userID')
   verificationOTP(
     @Param('userID', ParseIntPipe) userID: number,
     @Body() OTP: number,

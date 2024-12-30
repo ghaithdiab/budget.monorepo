@@ -1,5 +1,11 @@
 import z from 'zod'
 
+export enum Role {
+  ADMIN,
+  USER,
+  DEV
+}
+
 export type FormState =| {
       error?: {
         name?: string[];
@@ -9,6 +15,8 @@ export type FormState =| {
       message?: string;
     }
   | undefined;
+
+
 export const SignupFormSchema = z.object({
   name: z
     .string()
@@ -34,3 +42,32 @@ export const SignupFormSchema = z.object({
     })
     .trim(),
 });
+
+
+export const VerificationFormSchema = z.object({
+  pin: z.string().regex(/^\d{4}$/, {
+    message: "Your verification  code must be 4 numbers.",
+  }),
+})
+
+
+// Define the expected structure of the user data
+export interface UserCreated {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// Define the structure of the error response
+export interface SignUpError {
+  message: string;
+  response?: {
+    data?: {
+      error?: {
+        name?: string[];
+        email?: string[];
+        password?: string[];
+      };
+    };
+  };
+}

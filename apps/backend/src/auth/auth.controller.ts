@@ -2,7 +2,7 @@ import { Public } from './../common/decorators/pubulic.decorator';
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { CreateUserDto } from 'src/users/dtos/create-user.dto';
+import { SignUpDTO } from './dto/signUp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +10,7 @@ export class AuthController {
 
   @Public()
   @Post('signUp')
-  signUp(@Body() dto: CreateUserDto) {
+  signUp(@Body() dto: SignUpDTO) {
     console.log(dto);
     return this.authService.signUp(dto);
   }

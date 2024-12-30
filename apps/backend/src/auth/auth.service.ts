@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +14,7 @@ import { UserVerificationService } from 'src/user_verification/user_verification
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { SignUpDTO } from './dto/signUp.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,24 +23,21 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  async signUp(userDto: CreateUserDto) {
+  async signUp(userDto: SignUpDTO) {
     console.log(userDto);
     const user = await this.usersService.FindByEmail(userDto.email);
     if (user) throw new ConflictException('Email already existe');
     const newUser = await this.usersService.CreateUser(userDto);
-    console.log(newUser);
+    if (!newUser) throw new BadRequestException('user creation faild');
     const emailSended =
       await this.UserverificationService.sendOTPverificationEmail(
         newUser.id,
         newUser.email,
       );
     if (emailSended.accepted?.length > 0) {
-      return {
-        message: 'Signup was  succeful email verification was sended',
-        user: newUser,
-      };
+      return newUser;
     }
-    return { message: 'Signup was  succeful', user: newUser };
+    // throw new BadRequestException('email send failed');
   }
   async signIn(dto: AuthDto, Req: Request, Res: Response) {
     const { email, password } = dto;

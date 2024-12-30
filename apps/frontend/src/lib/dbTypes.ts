@@ -1,13 +1,5 @@
-import { Role } from '@prisma/client';
+import { Role } from "./type";
 
-export type AxiosResponse<T = any> = {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: any;
-  config: any;
-  request?: any;
-};
 export type UserModelDb = {
   id: number;
   name: string;
