@@ -5,10 +5,9 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  providers :[
-    {provide :APP_GUARD , useClass : AuthGuard },
-
+  providers: [
+    // {provide :APP_GUARD , useClass : AuthGuard },
   ],
-  imports:[AuthModule],
+  imports: [AuthModule],
 })
 export class CommonModule {}

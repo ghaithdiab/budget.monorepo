@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -15,12 +16,17 @@ import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { SignUpDTO } from './dto/signUp.dto';
+import { AuthJwtPayload } from 'src/util/types';
+import refreshConfig from './config/refresh.config';
+import { ConfigType } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private UserverificationService: UserVerificationService,
     private usersService: UsersService,
+    @Inject(refreshConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshConfig>,
   ) {}
 
   async signUp(userDto: SignUpDTO) {
@@ -71,5 +77,59 @@ export class AuthService {
       secret: jwtSecretKey,
     });
     return token;
+  }
+
+  async Login(userId: number, name?: string) {
+    const { accessToken, refreshToken } = await this.generateToken(userId);
+    return {
+      id: userId,
+      name: name,
+      accessToken,
+      refreshToken,
+    };
+  }
+  async generateToken(userId: number) {
+    const payload: AuthJwtPayload = { sub: userId };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET_KEY,
+      }),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+    return { accessToken, refreshToken };
+  }
+
+  async validateJwtUser(userId: number) {
+    const user = await this.usersService.GetUser(userId);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return { id: user.id };
+  }
+
+  async validateLocalUser(email: string, password: string) {
+    const user = await this.usersService.FindByEmail(email);
+    if (!user) throw new UnauthorizedException('user not found');
+
+    const isMatch = await this.comparePassword(password, user.password);
+    if (!isMatch) throw new UnauthorizedException('email or password mismatch');
+    return {
+      id: user.id,
+      name: user.name,
+    };
+  }
+
+  async validateReshfreshToken(userId: number) {
+    const user = await this.usersService.GetUser(userId);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    return { id: user.id };
+  }
+
+  async refreshToken(userId: number, name: string) {
+    const { accessToken, refreshToken } = await this.generateToken(userId);
+    return {
+      id: userId,
+      name: name,
+      accessToken,
+      refreshToken,
+    };
   }
 }

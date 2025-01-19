@@ -11,6 +11,7 @@ import {
   UsePipes,
   Req,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -19,6 +20,7 @@ import { AuthGuard } from 'src/common/auth/auth.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { Public } from 'src/common/decorators/pubulic.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -27,14 +29,16 @@ export class UsersController {
   @Get()
   // @UseGuards(AuthGuard)
   // @Roles(Role.ADMIN)
-  @Public()
+  // @Public()
+  @UseGuards(JwtAuthGuard)
   async GetAll(@Req() req) {
     return this.usersService.GetAllUsers();
   }
 
-  @Get(':id')
-  Get(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.GetUser(id);
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  Get(@Request() req) {
+    return this.usersService.GetUser(req.user.id);
   }
 
   @UsePipes(ValidationPipe)

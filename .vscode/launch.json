@@ -10,7 +10,7 @@
       "sourceMaps": true,
       "breakOnLoad": true,
       "runtimeArgs": ["--remote-debugging-port=9222"],
-      "preLaunchTask": "npm: debug"
+      "preLaunchTask": "next dev"
     }
   ]
 }

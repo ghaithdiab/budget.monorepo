@@ -43,6 +43,11 @@ export const SignupFormSchema = z.object({
     .trim(),
 });
 
+export const SignInFormSchema = z.object({
+  email : z.string().email({message: "Please enter a valid email."}).trim(),
+  password: z.string().min(8, { message: "Be at least 8 characters long" }).trim()
+})
+
 
 export const VerificationFormSchema = z.object({
   pin: z.string().regex(/^\d{4}$/, {
@@ -70,4 +75,15 @@ export interface SignUpError {
       };
     };
   };
+}
+
+
+export type Session ={
+  user : {
+    id:string;
+    name:string;
+    // role :string;
+  };
+  accessToken : string;
+  refreshToken : string;
 }

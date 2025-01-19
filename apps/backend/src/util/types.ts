@@ -1,5 +1,9 @@
 import { Role } from '@prisma/client';
 
+export type AuthJwtPayload = {
+  sub: number;
+};
+
 export type AxiosResponse<T = any> = {
   data: T;
   status: number;
