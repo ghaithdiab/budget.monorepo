@@ -4,6 +4,11 @@ export type AuthJwtPayload = {
   sub: number;
 };
 
+export type VerificationJwtPayload = {
+  userID: number;
+  hashedOTP: string;
+};
+
 export type AxiosResponse<T = any> = {
   data: T;
   status: number;

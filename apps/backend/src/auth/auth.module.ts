@@ -12,12 +12,14 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import refreshConfig from './config/refresh.config';
 import { RefreshStrategy } from './strategies/refresh.token.strategy';
+import verificationConfig from './config/verification.config';
 
 @Module({
   imports: [
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshConfig),
+    ConfigModule.forFeature(verificationConfig),
     MailerConfigModule,
   ],
   controllers: [AuthController],

@@ -53,7 +53,11 @@ export class UserVerificationService {
           },
         });
       }
-      return await this.mailerService.sendMail(emailOptions);
+      const messageInfo = await this.mailerService.sendMail(emailOptions);
+      return {
+        messageInfo: messageInfo,
+        hashedOTP: hashedOTP,
+      };
     } catch (err) {
       console.log(err);
     }

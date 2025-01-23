@@ -3,7 +3,7 @@ import { FormState, SignInFormSchema, SignupFormSchema } from "./type";
 import axiosInstance from "@/util/axiosInstance";
 import handleAxiosError from "@/util/errorHandler";
 import { redirect } from "next/navigation";
-import { createSession, updateSession } from "./session";
+import { createSession, createVerificationSession, updateSession } from "./session";
 
 
 
@@ -30,6 +30,16 @@ export async function signUp(state: FormState,formData: FormData): Promise<FormS
   }catch(err){
     return {message : handleAxiosError(err)}
   }
+
+  console.log(response.data);
+
+  await createVerificationSession({
+    user : {
+      id: response.data.id,
+    },
+    verificationToken : response.data.verificationToken,
+  })
+
   redirect(`/auth/verification?userId=${response.data.id}`);
   
 }

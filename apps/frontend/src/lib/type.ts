@@ -87,3 +87,10 @@ export type Session ={
   accessToken : string;
   refreshToken : string;
 }
+
+export type VerificationSession = {
+  user : {
+    id:string;
+  },
+  verificationToken : string;
+}
