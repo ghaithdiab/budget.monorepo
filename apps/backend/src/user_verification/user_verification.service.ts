@@ -76,35 +76,7 @@ export class UserVerificationService {
     }
   }
 
-  async verifiyOTP(userID: number, OTP: number): Promise<boolean> {
-    const userVerification =
-      await this.PrismaService.user_Verification.findUnique({
-        where: {
-          userId: userID,
-          isVerified: false,
-        },
-      });
-    if (!userVerification) throw new BadRequestException('user not found');
-    if (userVerification.expiredAt < new Date())
-      throw new BadRequestException('Your code has been expired');
-    const isMatch = await bcrypt.compareSync(
-      OTP.toString(),
-      userVerification.code,
-    );
-    if (!isMatch) throw new BadRequestException('Invalid OTP');
-    await this.PrismaService.users.update({
-      where: { id: userID },
-      data: {
-        verified: isMatch,
-      },
-    });
-    await this.PrismaService.user_Verification.delete({
-      where: { userId: userID },
-    });
-    return false;
-  }
-
-  async verifiyOTPV2(userID: number, OTP: number) {
+  async verifiyOTP(userID: number, OTP: number) {
     const userVerification = await this.getVerificationRecord(userID);
     if (!userVerification) throw new BadRequestException('user not found');
     const isMatch = await bcrypt.compareSync(
@@ -148,26 +120,16 @@ export class UserVerificationService {
     return {
       id: userVerificatin.userId,
     };
-    // if(userVerificatin.expiredAt < new Date()) throw new HttpException('Token expired',HttpStatus.BAD_REQUEST);
-    // const isMatch = await bcrypt.compare(OTP?.toString(), userVerificatin.code);
-    // if (!isMatch)
-    //   throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
-    // return {
-    //   id: userVerificatin.id,
-    //   email: userVerificatin.email,
-    // };
   }
 
   async generateVerificcationToken(userId: number, OTP: number) {
     const payload: VerificationJwtPayload = {
       userID: userId,
     };
-    console.log(this.verificationTokenConfig);
     const verificationToken = await this.jwtService.signAsync(
       payload,
       this.verificationTokenConfig,
     );
-    console.log(verificationToken);
     return verificationToken;
   }
 }

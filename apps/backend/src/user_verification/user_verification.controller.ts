@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Param,
-  ParseIntPipe,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { UserVerificationService } from './user_verification.service';
-import { Public } from 'src/common/decorators/pubulic.decorator';
 import { VerificationJwtGuard } from './guards/verificationJwtGuard/verificationJwtGuard';
 import { UserVerificationDTO } from './dto/user_verification.dto';
 
@@ -19,14 +9,13 @@ export class UserVerificationController {
     private readonly userVerificationService: UserVerificationService,
   ) {}
 
-  // @Public()
   @UseGuards(VerificationJwtGuard)
   @Post('verification')
   verificationOTP(
     @Req() req,
     @Body() userVerificationDTO: UserVerificationDTO,
   ) {
-    return this.userVerificationService.verifiyOTPV2(
+    return this.userVerificationService.verifiyOTP(
       req.user.id,
       parseInt(userVerificationDTO.OTP),
     );

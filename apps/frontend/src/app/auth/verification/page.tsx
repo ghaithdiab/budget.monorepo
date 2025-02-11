@@ -7,7 +7,7 @@ const verificationPage = async () => {
   const verificationSession  =await  getVerificationSession();
 
     if (!verificationSession || !verificationSession.user) {
-      redirect('/auth/signup')
+      redirect('/auth/notAuthorized')
   
     }
   return (

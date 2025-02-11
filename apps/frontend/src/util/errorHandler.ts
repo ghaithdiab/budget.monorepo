@@ -3,7 +3,6 @@ import axios from 'axios';
 const handleAxiosError = (error: any):string => {
   if (axios.isAxiosError(error)) {
     if (error.response){
-    console.log(error.response)
      const status = error.response.status;
      switch (status) {
        case 400: return `Bad Request: ${error.response.data.message}`;

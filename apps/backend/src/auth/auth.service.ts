@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   forwardRef,
   HttpException,
   HttpStatus,
@@ -9,14 +8,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
 import { UserVerificationService } from 'src/user_verification/user_verification.service';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { SignUpDTO } from './dto/signUp.dto';
-import { AuthJwtPayload, VerificationJwtPayload } from 'src/util/types';
+import { AuthJwtPayload } from 'src/util/types';
 import refreshConfig from './config/refresh.config';
 import { ConfigType } from '@nestjs/config';
 @Injectable()
@@ -54,24 +51,15 @@ export class AuthService {
     }
     throw new BadRequestException('email send failed');
   }
-  async signIn(dto: AuthDto, Req: Request, Res: Response) {
-    const { email, password } = dto;
-    const user = await this.usersService.FindByEmail(email);
-    if (!user) throw new BadRequestException('Account not existe');
 
-    const isMatch = await this.comparePassword(password, user.password);
-    if (!isMatch) throw new UnauthorizedException();
-
-    const token = await this.signToken(user.id, user.email);
-    if (!token) throw new ForbiddenException();
-    // Res.cookie('token',token);
-    Res.send({ message: 'Loggin successfuly', token });
-  }
-
-  async signOut(req: Request, res: Response) {
-    // implement sign out logic here
-    // res.clearCookie('token');
-    res.send({ message: 'Sign out successfuly' });
+  async signIn(userId: number, name?: string) {
+    const { accessToken, refreshToken } = await this.generateToken(userId);
+    return {
+      id: userId,
+      name: name,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async comparePassword(password: string, hash: string) {
@@ -88,15 +76,6 @@ export class AuthService {
     return token;
   }
 
-  async Login(userId: number, name?: string) {
-    const { accessToken, refreshToken } = await this.generateToken(userId);
-    return {
-      id: userId,
-      name: name,
-      accessToken,
-      refreshToken,
-    };
-  }
   async generateToken(userId: number) {
     const payload: AuthJwtPayload = { sub: userId };
     const [accessToken, refreshToken] = await Promise.all([

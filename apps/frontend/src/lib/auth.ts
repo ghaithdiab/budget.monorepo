@@ -31,7 +31,6 @@ export async function signUp(state: FormState,formData: FormData): Promise<FormS
     return {message : handleAxiosError(err)}
   }
 
-  console.log(response.data);
 
   await createVerificationSession({
     user : {
@@ -49,11 +48,10 @@ export async function signIn(state: FormState,formData: FormData): Promise<FormS
     email: formData.get("email"),
     password: formData.get("password"),
   });
-  console.log(validationFields);
   if (!validationFields.success) return { error: validationFields.error.flatten().fieldErrors};
   let response; 
   try{
-    response = await axiosInstance.post('auth/login',validationFields.data,{
+    response = await axiosInstance.post('auth/signIn',validationFields.data,{
       headers: {
         "Content-Type": "application/json",
       } 
@@ -62,7 +60,6 @@ export async function signIn(state: FormState,formData: FormData): Promise<FormS
     return {message: handleAxiosError(error)}
   }
 
-  console.log(response.data);
   await createSession({
     user :{
       id : response.data.id,
@@ -80,7 +77,6 @@ export async function verifyUser(state : VerificationFormState , formData : Form
   const validationFields = VerificationFormSchema.safeParse({
     OTP : formData.get('OTP')
     })
-    console.log(validationFields)
     if (!validationFields.success) return { error :validationFields.error.flatten().fieldErrors};
     let verificationToken = await getVerificationSession();
     if(!verificationToken) return {error : {OTP : ["Invalid verification token"]}};
@@ -90,7 +86,6 @@ export async function verifyUser(state : VerificationFormState , formData : Form
        verificationToken : verificationToken.verificationToken,
        OTP : formData.get('OTP'),
       })
-    console.log(response)
   await createSession({
     user :{
       id : response.data.id,

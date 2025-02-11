@@ -7,7 +7,6 @@ import verificationConfig from './config/verification.config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { VerificationTokenStrategy } from './stratgies/verification.token.strategy';
 import { VerificationJwtGuard } from './guards/verificationJwtGuard/verificationJwtGuard';
-import jwtConfig from 'src/auth/config/jwt.config';
 import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [
