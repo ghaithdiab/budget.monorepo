@@ -1,10 +1,12 @@
+import { IsString } from 'class-validator';
+
 export class UserVerificationDTO {
-  readonly userID :number;
-  readonly OTP : number;
-  
+  @IsString()
+  readonly verificationToken: string;
+  @IsString()
+  readonly OTP: string;
 }
 
-
-export class UserReverificationDTO{
-  readonly email :string
+export class UserReverificationDTO {
+  readonly email: string;
 }

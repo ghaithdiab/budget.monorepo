@@ -11,6 +11,20 @@
       "breakOnLoad": true,
       "runtimeArgs": ["--remote-debugging-port=9222"],
       "preLaunchTask": "next dev"
+    },
+    {
+      "name": "Debug NestJS Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/backend/src/main.ts", // Adjust the path to your NestJS entry point
+      "preLaunchTask": "tsc: build - tsconfig.json", // Optional: if you need to compile TypeScript
+      "outFiles": ["${workspaceFolder}/apps/backend/dist/**/*.js"], // Adjust the path to your compiled files
+      "sourceMaps": true,
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

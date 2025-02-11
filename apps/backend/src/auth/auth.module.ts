@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -12,7 +12,8 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import refreshConfig from './config/refresh.config';
 import { RefreshStrategy } from './strategies/refresh.token.strategy';
-import verificationConfig from './config/verification.config';
+import verificationConfig from '../user_verification/config/verification.config';
+import { UserVerificationModule } from 'src/user_verification/user_verification.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import verificationConfig from './config/verification.config';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshConfig),
     ConfigModule.forFeature(verificationConfig),
+    forwardRef(() => UserVerificationModule),
     MailerConfigModule,
   ],
   controllers: [AuthController],
@@ -34,6 +36,6 @@ import verificationConfig from './config/verification.config';
     JwtStrategy,
     RefreshStrategy,
   ],
-  exports: [JwtModule, JwtService],
+  exports: [JwtModule, JwtService, AuthService],
 })
 export class AuthModule {}

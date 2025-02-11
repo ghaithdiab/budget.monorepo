@@ -6,7 +6,7 @@ const handleAxiosError = (error: any):string => {
     console.log(error.response)
      const status = error.response.status;
      switch (status) {
-       case 400: return 'Bad Request: Please check the request data.';
+       case 400: return `Bad Request: ${error.response.data.message}`;
        case 401: return `Unauthorized: ${error.response.data.message}`;
        case 403: return 'Forbidden: You do not have access to this resource.';
        case 404: return 'Not Found: The requested resource could not be found.';

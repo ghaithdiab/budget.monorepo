@@ -1,6 +1,17 @@
-import { Body, Controller, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UserVerificationService } from './user_verification.service';
 import { Public } from 'src/common/decorators/pubulic.decorator';
+import { VerificationJwtGuard } from './guards/verificationJwtGuard/verificationJwtGuard';
+import { UserVerificationDTO } from './dto/user_verification.dto';
 
 @Controller('user-verification')
 export class UserVerificationController {
@@ -8,24 +19,28 @@ export class UserVerificationController {
     private readonly userVerificationService: UserVerificationService,
   ) {}
 
-  @Public()
-  @Post('verification:userID')
+  // @Public()
+  @UseGuards(VerificationJwtGuard)
+  @Post('verification')
   verificationOTP(
-    @Param('userID', ParseIntPipe) userID: number,
-    @Body() OTP: number,
+    @Req() req,
+    @Body() userVerificationDTO: UserVerificationDTO,
   ) {
-    return this.userVerificationService.verifiyOTP(userID, OTP);
-  }
-
-  @Public()
-  @Post('/ReSendCode/:userId')
-  resendOTP(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Body() email: string,
-  ) {
-    return this.userVerificationService.sendOTPverificationEmail(
-      userId,
-      (email as any).email,
+    return this.userVerificationService.verifiyOTPV2(
+      req.user.id,
+      parseInt(userVerificationDTO.OTP),
     );
   }
+
+  // @Public()
+  // @Post('/ReSendCode/:userId')
+  // resendOTP(
+  //   @Param('userId', ParseIntPipe) userId: number,
+  //   @Body() email: string,
+  // ) {
+  //   return this.userVerificationService.sendOTPverificationEmail(
+  //     userId,
+  //     (email as any).email,
+  //   );
+  // }
 }

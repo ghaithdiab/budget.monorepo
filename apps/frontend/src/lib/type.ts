@@ -16,6 +16,12 @@ export type FormState =| {
     }
   | undefined;
 
+export type VerificationFormState = | {
+  error?: {
+    OTP?: string[];
+  };
+  message?: string;
+} | undefined;
 
 export const SignupFormSchema = z.object({
   name: z
@@ -50,7 +56,7 @@ export const SignInFormSchema = z.object({
 
 
 export const VerificationFormSchema = z.object({
-  pin: z.string().regex(/^\d{4}$/, {
+  OTP: z.string().regex(/^\d{4}$/, {
     message: "Your verification  code must be 4 numbers.",
   }),
 })

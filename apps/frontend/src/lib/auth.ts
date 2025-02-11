@@ -1,9 +1,9 @@
 "use server"
-import { FormState, SignInFormSchema, SignupFormSchema } from "./type";
+import { FormState, SignInFormSchema, SignupFormSchema, VerificationFormSchema, VerificationFormState } from "./type";
 import axiosInstance from "@/util/axiosInstance";
 import handleAxiosError from "@/util/errorHandler";
 import { redirect } from "next/navigation";
-import { createSession, createVerificationSession, updateSession } from "./session";
+import { createSession, createVerificationSession, getVerificationSession, updateSession } from "./session";
 
 
 
@@ -40,7 +40,7 @@ export async function signUp(state: FormState,formData: FormData): Promise<FormS
     verificationToken : response.data.verificationToken,
   })
 
-  redirect(`/auth/verification?userId=${response.data.id}`);
+  redirect(`/auth/verification`);
   
 }
 
@@ -75,6 +75,37 @@ export async function signIn(state: FormState,formData: FormData): Promise<FormS
   redirect('/dashboard');
 }
 
+
+export async function verifyUser(state : VerificationFormState , formData : FormData) :Promise<VerificationFormState>{
+  const validationFields = VerificationFormSchema.safeParse({
+    OTP : formData.get('OTP')
+    })
+    console.log(validationFields)
+    if (!validationFields.success) return { error :validationFields.error.flatten().fieldErrors};
+    let verificationToken = await getVerificationSession();
+    if(!verificationToken) return {error : {OTP : ["Invalid verification token"]}};
+    let response;
+    try{
+      response = await axiosInstance.post('user-verification/verification',{
+       verificationToken : verificationToken.verificationToken,
+       OTP : formData.get('OTP'),
+      })
+    console.log(response)
+  await createSession({
+    user :{
+      id : response.data.id,
+      name : response.data.name,
+      // roles : response.data.roles,
+    },
+    accessToken : response.data.accessToken,
+    refreshToken : response.data.refreshToken,
+  });
+  redirect('/dashboard');
+} catch(error){
+  return {message: handleAxiosError(error)}
+}
+
+}
 
 export const refreshToken = async (oldRefreshToken : string)=>{
   try{

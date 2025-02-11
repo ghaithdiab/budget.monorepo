@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  forwardRef,
   HttpException,
   HttpStatus,
   Inject,
@@ -13,42 +14,38 @@ import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { UserVerificationService } from 'src/user_verification/user_verification.service';
 import { UsersService } from 'src/users/users.service';
-import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { SignUpDTO } from './dto/signUp.dto';
 import { AuthJwtPayload, VerificationJwtPayload } from 'src/util/types';
 import refreshConfig from './config/refresh.config';
 import { ConfigType } from '@nestjs/config';
-import verificationConfig from './config/verification.config';
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private UserverificationService: UserVerificationService,
+    @Inject(forwardRef(() => UserVerificationService))
+    private readonly userverificationService: UserVerificationService,
     private usersService: UsersService,
     @Inject(refreshConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshConfig>,
-    @Inject(verificationConfig.KEY)
-    private verificationTokenConfig: ConfigType<typeof verificationConfig>,
   ) {}
 
   async signUp(userDto: SignUpDTO) {
-    console.log(userDto);
     const user = await this.usersService.FindByEmail(userDto.email);
     if (user) throw new ConflictException('Email already existe');
     const newUser = await this.usersService.CreateUser(userDto);
     if (!newUser) throw new BadRequestException('user creation faild');
-    const { messageInfo, hashedOTP } =
-      await this.UserverificationService.sendOTPverificationEmail(
+    const { messageInfo, OTP } =
+      await this.userverificationService.sendOTPverificationEmail(
         newUser.id,
         newUser.email,
       );
     if (messageInfo.accepted?.length > 0) {
-      console.log(newUser);
-      const verificationToken = await this.generateVerificcationToken(
-        newUser.id,
-        hashedOTP,
-      );
+      const verificationToken =
+        await this.userverificationService.generateVerificcationToken(
+          newUser.id,
+          OTP,
+        );
 
       return {
         id: newUser.id,
@@ -109,20 +106,6 @@ export class AuthService {
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
     ]);
     return { accessToken, refreshToken };
-  }
-
-  async generateVerificcationToken(userId: number, hashedOTP: string) {
-    const payload: VerificationJwtPayload = {
-      userID: userId,
-      hashedOTP: hashedOTP,
-    };
-    console.log(this.verificationTokenConfig);
-    const verificationToken = await this.jwtService.signAsync(
-      payload,
-      this.verificationTokenConfig,
-    );
-    console.log(verificationToken);
-    return verificationToken;
   }
 
   async validateJwtUser(userId: number) {

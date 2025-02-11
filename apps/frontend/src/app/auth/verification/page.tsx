@@ -1,6 +1,15 @@
 import React from 'react'
 import VerificationForm from './verificationForm'
-const verificationPage = () => {
+import { getVerificationSession } from '@/lib/session'
+import { redirect } from 'next/navigation';
+const verificationPage = async () => {
+
+  const verificationSession  =await  getVerificationSession();
+
+    if (!verificationSession || !verificationSession.user) {
+      redirect('/auth/signup')
+  
+    }
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg w-1/4 flex flex-col justify-center items-center">
     <h1 className="text-center text-2xl font-bold mb-4">Verification code</h1>
