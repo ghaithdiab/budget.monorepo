@@ -16,7 +16,8 @@ const handleAxiosError = (error: any):string => {
    } else {
      return  error.message;
    } 
- } else { 
+ } else {
+  console.log(error);
    return 'An unexpected error occurred. Please try again later.';
  } 
 };

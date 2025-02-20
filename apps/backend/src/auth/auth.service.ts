@@ -33,10 +33,7 @@ export class AuthService {
     const newUser = await this.usersService.CreateUser(userDto);
     if (!newUser) throw new BadRequestException('user creation faild');
     const { messageInfo, OTP } =
-      await this.userverificationService.sendOTPverificationEmail(
-        newUser.id,
-        newUser.email,
-      );
+      await this.userverificationService.sendOTPverificationEmail(newUser.id);
     if (messageInfo.accepted?.length > 0) {
       const verificationToken =
         await this.userverificationService.generateVerificcationToken(

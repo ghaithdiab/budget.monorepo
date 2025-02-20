@@ -3,11 +3,13 @@
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
+import ResendVerificationButton from '@/components/ui/resendVerificationCodeButton';
 import SubmitButton from '@/components/ui/submitButton';
 import { toast } from '@/hooks/use-toast'
-import { verifyUser } from '@/lib/auth';
+import { ResendVerificationCode, verifyUser } from '@/lib/auth';
 import { VerificationFormSchema } from '@/lib/type'
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link';
 import React, { useActionState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -54,14 +56,16 @@ const VerificationForm = () => {
             <FormItem>
               <FormLabel>Please enter your verification code sent to your email.</FormLabel>
               <FormControl>
+                <div className='flex justify-center'>
                 <InputOTP maxLength={4} {...field}>
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} />
+                    <InputOTPSlot autoFocus index={0} />
                     <InputOTPSlot index={1} />
                     <InputOTPSlot index={2} />
                     <InputOTPSlot index={3} />
                   </InputOTPGroup>
                 </InputOTP>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -69,8 +73,22 @@ const VerificationForm = () => {
         />
         {/* <Button type="submit">Submit</Button> */}
         <SubmitButton>Verify</SubmitButton>
+        {/* <div className="flex justify-between text-sm">
+          <p> Don't have an account? </p>
+          <Link className="text-sm underline" href="/auth/signup">
+            Sign Up
+          </Link>
+        </div> */}
       </form>
     </Form>
+    <ResendVerificationButton></ResendVerificationButton>
+    {/* <div>
+      <p>Didn't receive the code?</p>
+      <Link className="underline" href={"/auth/resend"}>
+        Resend code
+      </Link>
+    </div> */}
+    {/* <Button onClick={ResendVerificationCode}>Resend code</Button> */}
     </div>
   )
 

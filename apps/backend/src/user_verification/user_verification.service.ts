@@ -28,8 +28,11 @@ export class UserVerificationService {
     private readonly AuthService: AuthService,
   ) {}
 
-  async sendOTPverificationEmail(userId: number, email: string) {
+  async sendOTPverificationEmail(userId: number) {
     try {
+      const email = (
+        await this.PrismaService.users.findUnique({ where: { id: userId } })
+      ).email;
       const OTP = Math.floor(1000 + Math.random() * 9000);
       const emailOptions: ISendMailOptions = {
         from: {

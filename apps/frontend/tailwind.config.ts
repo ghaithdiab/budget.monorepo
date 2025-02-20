@@ -55,7 +55,10 @@ export default {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+			fontSize :{
+				'0.9rem' :'0.9rem'
+			}
   	}
   },
   plugins: [require("tailwindcss-animate")],

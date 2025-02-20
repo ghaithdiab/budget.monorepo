@@ -93,15 +93,10 @@ export const createVerificationSession = async (payload:VerificationSession)=>{
 
 
 export const getVerificationSession = async ()=>{
-  try{
     const cookie = (await cookies()).get("verificationSession")?.value;
     if(!cookie) return null;
     const {payload} = await jwtVerify(cookie,verificationEncodedKey,{algorithms:["HS256"]});
     return payload as VerificationSession
-  }catch(err){
-    console.error(err)
-    redirect('/auth/signup')
-  }
 }
 
 

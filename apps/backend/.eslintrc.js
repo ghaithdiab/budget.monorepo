@@ -1,4 +1,14 @@
+// import tseslint from 'typescript-eslint';
+const eslint = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+
 module.exports = {
+  ignores: ['node_modules', 'dist'],
+  files: ['src/**/*.ts'],
+  extends: [
+    eslint.configs.recommended,
+    tseslint.configs.recommendedTypeChecked,
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: 'tsconfig.json',
@@ -21,7 +31,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    'prettier/prettier':0,
-    "@typescript-eslint/no-unused-vars": ["warn"]
+    'prettier/prettier': 0,
+    '@typescript-eslint/no-unused-vars': ['warn'],
   },
 };

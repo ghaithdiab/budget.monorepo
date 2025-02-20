@@ -85,7 +85,16 @@ export async function verifyUser(state : VerificationFormState , formData : Form
       response = await axiosInstance.post('user-verification/verification',{
        verificationToken : verificationToken.verificationToken,
        OTP : formData.get('OTP'),
+      },{
+        headers: {
+          "Content-Type": "application/json",
+        }
       })
+    console.log(response)
+    }
+    catch(error){
+      return {message: handleAxiosError(error)}
+    }
   await createSession({
     user :{
       id : response.data.id,
@@ -96,9 +105,6 @@ export async function verifyUser(state : VerificationFormState , formData : Form
     refreshToken : response.data.refreshToken,
   });
   redirect('/dashboard');
-} catch(error){
-  return {message: handleAxiosError(error)}
-}
 
 }
 
@@ -115,5 +121,19 @@ export const refreshToken = async (oldRefreshToken : string)=>{
     return accessToken
   }catch(e){
     return {message: handleAxiosError(e)}
+  }
+}
+
+
+export const ResendVerificationCode = async ()=>{
+  const token  =await getVerificationSession();
+  if(!token) return {error : "Invalid verification token"};
+  let response;
+  try{
+    response = axiosInstance.post('user-verification/resend',{
+      verificationToken : token.verificationToken
+    })
+  }catch(e){
+    return {message : handleAxiosError(e)}
   }
 }

@@ -21,6 +21,11 @@ export class UserVerificationController {
     );
   }
 
+  @UseGuards(VerificationJwtGuard)
+  @Post('resend')
+  resendOTP(@Req() req) {
+    return this.userVerificationService.sendOTPverificationEmail(req.user.id);
+  }
   // @Public()
   // @Post('/ReSendCode/:userId')
   // resendOTP(
